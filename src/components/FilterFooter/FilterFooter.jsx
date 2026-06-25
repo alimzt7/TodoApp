@@ -1,20 +1,50 @@
-const FilterFooter = () => (
-  <div className="FilterFooter">
-    <div>2 items</div>
-    <div>
-      <ul>
-        <li>
-          <button type="button">All</button>
-        </li>
-        <li>
-          <button type="button">Active</button>
-        </li>
-        <li>
-          <button type="button">Completed</button>
-        </li>
-      </ul>
+import { useState } from "react";
+import "./FilterFooter.css";
+
+const FilterFooter = ({ tasks, updateFilter }) => {
+  const [filter, setFilter] = useState("all");
+
+  const handleFilter = (filterName) => {
+    setFilter(filterName);
+    updateFilter(filterName);
+  };
+
+  return (
+    <div className="FilterFooter">
+      <div className="FilterFooter__countItems">{tasks.length} items</div>
+      <div className="FilterFooter__filters">
+        <ul>
+          <li>
+            <button
+              onClick={() => handleFilter("all")}
+              type="button"
+              className={filter === "all" ? "active" : ""}
+            >
+              All
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => handleFilter("active")}
+              type="button"
+              className={filter === "active" ? "active" : ""}
+            >
+              Active
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => handleFilter("completed")}
+              type="button"
+              className={filter === "completed" ? "active" : ""}
+            >
+              Completed
+            </button>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default FilterFooter;

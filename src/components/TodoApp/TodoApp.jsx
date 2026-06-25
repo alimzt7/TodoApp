@@ -1,11 +1,76 @@
+import { useEffect, useState } from "react";
 import { AddTaskForm, TaskList, FilterFooter } from "../../components";
+import "./TodoApp.css";
+import { v4 as uuidv4 } from "uuid";
 
-const TodoApp = () => (
-  <div className="TodoApp">
-    <AddTaskForm />
-    <TaskList />
-    <FilterFooter />
-  </div>
-);
+const TodoApp = () => {
+  const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]);
+  const [filter, setFilter] = useState("all");
+  const [refresh, setRefresh] = useState(0);
+
+  useEffect(() => {
+    let storedTasks = localStorage.getItem("tasks");
+    if (storedTasks) {
+      storedTasks = JSON.parse(storedTasks);
+    }
+    setTasks(storedTasks);
+  }, []);
+
+  useEffect(() => {
+    if (filter === "all") {
+      setFilteredTasks(tasks);
+    }
+    if (filter === "completed") {
+      const newCompletedFilteredTasks = tasks.filter((task) => task.status);
+      setFilteredTasks(newCompletedFilteredTasks);
+    }
+    if (filter === "active") {
+      const newActivveFilteredTasks = tasks.filter((task) => !task.status);
+      setFilteredTasks(newActivveFilteredTasks);
+    }
+  }, [filter, tasks, refresh]);
+
+  const addTask = (taskTitle) => {
+    const newTasks = [
+      ...tasks,
+      {
+        id: uuidv4(),
+        title: taskTitle,
+        status: false,
+      },
+    ];
+    setTasks(newTasks);
+    localStorage.setItem("tasks", JSON.stringify(newTasks));
+  };
+
+  const deleteTask = (taskId) => {
+    const newTaskList = tasks.filter((task) => task.id !== taskId);
+
+    setTasks(newTaskList);
+    localStorage.setItem("tasks", JSON.stringify(newTaskList));
+  };
+
+  const handleChangeStatus = (taskId) => {
+    let newTasksList = tasks;
+    const taskIndex = tasks.findIndex((task) => task.id === taskId);
+    newTasksList[taskIndex].status = !newTasksList[taskIndex].status;
+    setTasks(newTasksList);
+    localStorage.setItem("tasks", JSON.stringify(newTasksList));
+    setRefresh(refresh + 1);
+  };
+
+  return (
+    <div className="TodoApp">
+      <AddTaskForm addTask={addTask} />
+      <TaskList
+        tasks={filteredTasks}
+        deleteTask={deleteTask}
+        handleChangeStatus={handleChangeStatus}
+      />
+      <FilterFooter updateFilter={setFilter} tasks={tasks} />
+    </div>
+  );
+};
 
 export default TodoApp;

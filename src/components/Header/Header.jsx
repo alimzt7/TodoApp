@@ -1,5 +1,7 @@
+import "./Header.css";
+
 const Header = () => (
-  <header className="header">
+  <header className="Header">
     <h1>My Todo</h1>
   </header>
 );
